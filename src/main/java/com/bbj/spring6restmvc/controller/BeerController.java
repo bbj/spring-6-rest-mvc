@@ -32,7 +32,29 @@ import java.util.UUID;
 @RestController                     //replace @Controller by @RestController
 @RequestMapping("/api/v1/beer")   //base path for all queries
 public class BeerController {
+
     private final BeerService beerService;
+
+    @DeleteMapping("{beerId}")
+    public ResponseEntity deleteById(@PathVariable("beerId") UUID beerId) {
+
+        beerService.deleteById(beerId);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * It is more reliable to depend on @PathVariable("beerId")
+     * than on the parameter name (UUID id)
+     */
+    @PutMapping("{beerId}")
+    public ResponseEntity updateById(
+            @PathVariable("beerId") UUID beerId,
+            @RequestBody Beer beer) {
+
+        beerService.updateBeerById(beerId, beer);
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT); //update ok, no content returned
+    }
 
     //@RequestMapping(method = RequestMethod.POST) is equivalent to @PostMapping
     @PostMapping
