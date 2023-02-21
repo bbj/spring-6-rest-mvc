@@ -1,5 +1,6 @@
 package com.bbj.spring6restmvc.service;
 
+import ch.qos.logback.classic.pattern.ClassOfCallerConverter;
 import com.bbj.spring6restmvc.model.Beer;
 import com.bbj.spring6restmvc.model.BeerStyle;
 import lombok.extern.slf4j.Slf4j;
@@ -70,5 +71,22 @@ public class BeerServiceImpl implements BeerService {
     public Beer getBeerById(UUID id) {
         log.debug("Get Beer Id - in service. Id: "+id.toString());
         return beerMap.get(id);
+    }
+
+    @Override
+    public Beer saveNewBeer(Beer beer) {
+        //we are mimicking what a persistent store would do; using lombok generated builder
+        Beer savedBeer = Beer.builder()
+                .id(UUID.randomUUID())
+                .createdDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .beerName(beer.getBeerName())
+                .beerStyle(beer.getBeerStyle())
+                .quantityOnHand(beer.getQuantityOnHand())
+                .upc(beer.getUpc())
+                .price(beer.getPrice())
+                .build();
+        beerMap.put(savedBeer.getId(), savedBeer);
+        return savedBeer;
     }
 }
