@@ -3,6 +3,7 @@ package com.bbj.spring6restmvc.controller;
 import com.bbj.spring6restmvc.model.Beer;
 import com.bbj.spring6restmvc.service.BeerService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,8 @@ import java.util.UUID;
  * with the @ResponseBody annotation since Spring does it by default.
  */
 @Slf4j
-@AllArgsConstructor
+//@AllArgsConstructor               //was a mistake before => @RequiredArgsConstructor
+@RequiredArgsConstructor
 @RestController                     //replace @Controller by @RestController (@ResponseBody applied)
 @RequestMapping("/api/v1/beer")   //base path for all queries
 public class BeerController {
