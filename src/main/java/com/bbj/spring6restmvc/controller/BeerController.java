@@ -25,17 +25,22 @@ import java.util.UUID;
  * will generate a constructor with the service as param
  *
  * replace @Controller (regular SpringMVC) by @RestController (Rest).
- * Will turn back JSON instead of HTML response
+ * Will turn back JSON instead of HTML response.
+ * It applies the @ResponseBody annotation to all methods which instructs Spring to
+ * serialize the body of the response into JSON.
+ * Remember, we don't need to annotate the @RestController-annotated controllers
+ * with the @ResponseBody annotation since Spring does it by default.
  */
 @Slf4j
 @AllArgsConstructor
-@RestController                     //replace @Controller by @RestController
+@RestController                     //replace @Controller by @RestController (@ResponseBody applied)
 @RequestMapping("/api/v1/beer")   //base path for all queries
 public class BeerController {
 
     private final BeerService beerService;
 
     @PatchMapping("{beerId}")
+    //@ResponseBody - not needed because we have @RestController
     public ResponseEntity patchBeerById(
             @PathVariable("beerId") UUID beerId,
             @RequestBody Beer beer) {
