@@ -5,6 +5,7 @@ import com.bbj.spring6restmvc.model.Beer;
 import com.bbj.spring6restmvc.model.BeerStyle;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -104,5 +105,43 @@ public class BeerServiceImpl implements BeerService {
     @Override
     public void deleteById(UUID beerId) {
         beerMap.remove(beerId);
+    }
+
+    // PATCH operation is pretty rare, most of the time we do not need it
+    // and we use UPDATE instead
+    @Override
+    public void patchBeerById(UUID beerId, Beer beer) {
+        Beer existing = beerMap.get(beerId);
+
+        // patching is about detecting what has changed
+        // and update the existing object in the database
+
+        boolean isUpdated = false;
+        if (StringUtils.hasText(beer.getBeerName())){
+            existing.setBeerName(beer.getBeerName());
+            isUpdated = true;
+        }
+
+        if (beer.getBeerStyle() != null) {
+            existing.setBeerStyle(beer.getBeerStyle());
+            isUpdated = true;
+        }
+
+        if (beer.getPrice() != null) {
+            existing.setPrice(beer.getPrice());
+            isUpdated = true;
+        }
+
+        if (beer.getQuantityOnHand() != null){
+            existing.setQuantityOnHand(beer.getQuantityOnHand());
+            isUpdated = true;
+        }
+
+        if (StringUtils.hasText(beer.getUpc())) {
+            existing.setUpc(beer.getUpc());
+            isUpdated = true;
+        }
+
+        if (isUpdated) existing.setUpdateDate(LocalDateTime.now());
     }
 }
