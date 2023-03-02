@@ -1,21 +1,19 @@
 package com.bbj.spring6restmvc.controller;
 
-import com.bbj.spring6restmvc.model.Beer;
-import com.bbj.spring6restmvc.service.BeerService;
-import lombok.AllArgsConstructor;
+import com.bbj.spring6restmvc.model.BeerDTO;
+import com.bbj.spring6restmvc.services.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 /**
- * why not having BeerController as an interface like for service?
+ * why not having BeerController as an interface like for services?
  * because we generally do not switch controllers (1 class)
  * so would not be useful
  *
@@ -23,7 +21,7 @@ import java.util.UUID;
  * we ask lombok to do it, for the private final properties.
  *
  * BeerService will be injected at runtime, as lombok @AllArgsConstructor
- * will generate a constructor with the service as param
+ * will generate a constructor with the services as param
  *
  * replace @Controller (regular SpringMVC) by @RestController (Rest).
  * Will turn back JSON instead of HTML response.
@@ -39,13 +37,16 @@ import java.util.UUID;
 @RequestMapping("/api/v1/beer")   //base path for all queries
 public class BeerController {
 
+    public static final String BEER_PATH = "/api/v1/beer";
+    public static final String BEER_PATH_ID = BEER_PATH + "/{beerId}";
+
     private final BeerService beerService;
 
     @PatchMapping("{beerId}")
     //@ResponseBody - not needed because we have @RestController
     public ResponseEntity patchBeerById(
             @PathVariable("beerId") UUID beerId,
-            @RequestBody Beer beer) {
+            @RequestBody BeerDTO beer) {
 
         beerService.patchBeerById(beerId, beer);
 
@@ -66,7 +67,7 @@ public class BeerController {
     @PutMapping("{beerId}")
     public ResponseEntity updateById(
             @PathVariable("beerId") UUID beerId,
-            @RequestBody Beer beer) {
+            @RequestBody BeerDTO beer) {
 
         beerService.updateBeerById(beerId, beer);
 
@@ -75,10 +76,10 @@ public class BeerController {
 
     //@RequestMapping(method = RequestMethod.POST) is equivalent to @PostMapping
     @PostMapping
-    public ResponseEntity handlePost(@RequestBody Beer beer) {
+    public ResponseEntity handlePost(@RequestBody BeerDTO beer) {
 
-        //@RequestBody tells Spring to bind the HTTP request body to this (Beer beer) param
-        Beer savedBeer = beerService.saveNewBeer(beer);
+        //@RequestBody tells Spring to bind the HTTP request body to this (BeerDTO beer) param
+        BeerDTO savedBeer = beerService.saveNewBeer(beer);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", "/api/v1/beer/" + savedBeer.getId().toString());
@@ -90,7 +91,7 @@ public class BeerController {
 
     //if method not specified => will answer all methods (PUT, POST ....)
     @RequestMapping(method = RequestMethod.GET)
-    public List<Beer> listBeers() {
+    public List<BeerDTO> listBeers() {
         //beerService.listBeers() does a new ArrayList<>(beerMap.values())
         //where beerMap.values() returns a Collection<V> where V = String
         return beerService.listBeers();
@@ -101,9 +102,9 @@ public class BeerController {
      * than on the parameter name (UUID id)
      */
     @RequestMapping("{beerId}")
-    public Beer getBeerById(@PathVariable("beerId") UUID id) {
+    public BeerDTO getBeerById(@PathVariable("beerId") UUID id) {
 
-        log.debug("Get Beer by Id - in beer controller; id="+id.toString());
-        return beerService.getBeerById(id);
+        log.debug("Get BeerDTO by Id - in beer controller; id="+id.toString());
+        return beerService.getBeerById(id).orElseThrow(NotFoundException::new);
     }
 }

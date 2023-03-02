@@ -1,7 +1,6 @@
-package com.bbj.spring6restmvc.service;
+package com.bbj.spring6restmvc.services;
 
-import ch.qos.logback.classic.pattern.ClassOfCallerConverter;
-import com.bbj.spring6restmvc.model.Beer;
+import com.bbj.spring6restmvc.model.BeerDTO;
 import com.bbj.spring6restmvc.model.BeerStyle;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,13 +15,13 @@ import java.util.*;
 public class BeerServiceImpl implements BeerService {
 
     //beers are stored in a HashMap, initialized in the constructor
-    private Map<UUID, Beer> beerMap;
+    private Map<UUID, BeerDTO> beerMap;
 
     //the constructor creates 3 beers and add it to the beerMap HashMap
     public BeerServiceImpl() {
         this.beerMap = new HashMap<>();
 
-        Beer beer1 = Beer.builder()
+        BeerDTO beer1 = BeerDTO.builder()
                 .id(UUID.randomUUID())
                 .version(1)
                 .beerName("Galaxy Cat")
@@ -34,7 +33,7 @@ public class BeerServiceImpl implements BeerService {
                 .updateDate(LocalDateTime.now())
                 .build();
 
-        Beer beer2 = Beer.builder()
+        BeerDTO beer2 = BeerDTO.builder()
                 .id(UUID.randomUUID())
                 .version(1)
                 .beerName("Crank")
@@ -46,7 +45,7 @@ public class BeerServiceImpl implements BeerService {
                 .updateDate(LocalDateTime.now())
                 .build();
 
-        Beer beer3 = Beer.builder()
+        BeerDTO beer3 = BeerDTO.builder()
                 .id(UUID.randomUUID())
                 .version(1)
                 .beerName("Sunshine City")
@@ -64,20 +63,28 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public List<Beer> listBeers() {
+    public List<BeerDTO> listBeers() {
         return new ArrayList<>(beerMap.values());
     }
 
+//    @Override
+//    public BeerDTO getBeerById(UUID id) {
+//        log.debug("Get BeerDTO Id - in services. Id: "+id.toString());
+//        return beerMap.get(id);
+//    }
+
     @Override
-    public Beer getBeerById(UUID id) {
-        log.debug("Get Beer Id - in service. Id: "+id.toString());
-        return beerMap.get(id);
+    public Optional<BeerDTO> getBeerById(UUID id) {
+
+        log.debug("Get Beer by Id - in services. Id: " + id.toString());
+
+        return Optional.of(beerMap.get(id));
     }
 
     @Override
-    public Beer saveNewBeer(Beer beer) {
+    public BeerDTO saveNewBeer(BeerDTO beer) {
         //we are mimicking what a persistent store would do; using lombok generated builder
-        Beer savedBeer = Beer.builder()
+        BeerDTO savedBeer = BeerDTO.builder()
                 .id(UUID.randomUUID())
                 .createdDate(LocalDateTime.now())
                 .updateDate(LocalDateTime.now())
@@ -92,8 +99,8 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public void updateBeerById(UUID beerId, Beer beer) {
-        Beer existing = beerMap.get(beerId);
+    public void updateBeerById(UUID beerId, BeerDTO beer) {
+        BeerDTO existing = beerMap.get(beerId);
         existing.setBeerName(beer.getBeerName());
         existing.setPrice(beer.getPrice());
         existing.setUpc(beer.getUpc());
@@ -110,8 +117,8 @@ public class BeerServiceImpl implements BeerService {
     // PATCH operation is pretty rare, most of the time we do not need it
     // and we use UPDATE instead
     @Override
-    public void patchBeerById(UUID beerId, Beer beer) {
-        Beer existing = beerMap.get(beerId);
+    public void patchBeerById(UUID beerId, BeerDTO beer) {
+        BeerDTO existing = beerMap.get(beerId);
 
         // patching is about detecting what has changed
         // and update the existing object in the database
