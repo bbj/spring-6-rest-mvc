@@ -1,5 +1,6 @@
 package com.bbj.spring6restmvc.controller;
 
+import com.bbj.spring6restmvc.mappers.BeerMapper;
 import com.bbj.spring6restmvc.model.BeerDTO;
 import com.bbj.spring6restmvc.entities.Beer;
 import com.bbj.spring6restmvc.repositories.BeerRepository;
@@ -7,6 +8,8 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
@@ -22,8 +25,53 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class BeerControllerIT {
     @Autowired
     BeerController beerController;
+
     @Autowired
     BeerRepository beerRepository;
+
+    @Autowired
+    BeerMapper beerMapper;
+
+    @Test
+    void updateExistingBeer() {
+        Beer beer = beerRepository.findAll().get(0);
+        BeerDTO beerDTO = beerMapper.beerToBeerDto(beer);
+        beerDTO.setId(null);
+        beerDTO.setVersion(null);
+        final String beerName = "UPDATED";
+        beerDTO.setBeerName(beerName);
+
+        ResponseEntity responseEntity = beerController.updateById(beer.getId(), beerDTO);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+
+        Beer updatedBeer = beerRepository.findById(beer.getId()).get(); //Optional.get()
+        assertThat(updatedBeer.getBeerName()).isEqualTo(beerName);
+    }
+
+    //WARNING this test is modifying the database => ask Spring to make it transactional and rollback it at the end
+    @Rollback
+    @Transactional
+    @Test
+    void saveNewBeerTest() {
+        BeerDTO beerDTO = BeerDTO.builder()
+                .beerName("New Beer")
+                .build();
+
+        //in reality SpringMVC will transform HTTP request body into a DTO object
+        //here we create the DTO with Lombok builder and pass it to controller
+        ResponseEntity responseEntity = beerController.handlePost(beerDTO);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(201));
+        assertThat(responseEntity.getHeaders().getLocation()).isNotNull(); //java.net.URI getLocation()
+
+        //location is the URL of the newly created entity, UUID is in position 5
+        //e.g. /api/v1/beer/theid
+        String[] locationUUID = responseEntity.getHeaders().getLocation().getPath().split("/");
+        UUID savedUUID = UUID.fromString(locationUUID[4]);
+
+        Beer beer = beerRepository.findById(savedUUID).get();
+        assertThat(beer).isNotNull();
+    }
 
     @Test
     void testBeerIdNotFound() {

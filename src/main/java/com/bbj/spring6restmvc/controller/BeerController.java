@@ -42,7 +42,7 @@ public class BeerController {
 
     private final BeerService beerService;
 
-    @PatchMapping("{beerId}")
+    @PatchMapping(BEER_PATH_ID)
     //@ResponseBody - not needed because we have @RestController
     public ResponseEntity patchBeerById(
             @PathVariable("beerId") UUID beerId,
@@ -53,7 +53,7 @@ public class BeerController {
         return new ResponseEntity(HttpStatus.NO_CONTENT); //update ok, no content returned
     }
 
-    @DeleteMapping("{beerId}")
+    @DeleteMapping(BEER_PATH_ID)
     public ResponseEntity deleteById(@PathVariable("beerId") UUID beerId) {
 
         beerService.deleteById(beerId);
@@ -64,7 +64,7 @@ public class BeerController {
      * It is more reliable to depend on @PathVariable("beerId")
      * than on the parameter name (UUID id)
      */
-    @PutMapping("{beerId}")
+    @PutMapping(BEER_PATH_ID)
     public ResponseEntity updateById(
             @PathVariable("beerId") UUID beerId,
             @RequestBody BeerDTO beer) {
@@ -75,14 +75,14 @@ public class BeerController {
     }
 
     //@RequestMapping(method = RequestMethod.POST) is equivalent to @PostMapping
-    @PostMapping
+    @PostMapping(BEER_PATH)
     public ResponseEntity handlePost(@RequestBody BeerDTO beer) {
 
         //@RequestBody tells Spring to bind the HTTP request body to this (BeerDTO beer) param
         BeerDTO savedBeer = beerService.saveNewBeer(beer);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/api/v1/beer/" + savedBeer.getId().toString());
+        headers.add("Location", BEER_PATH +"/"+savedBeer.getId().toString());
 
         return new ResponseEntity(
                 headers,
@@ -101,7 +101,7 @@ public class BeerController {
      * It is more reliable to depend on @PathVariable("beerId")
      * than on the parameter name (UUID id)
      */
-    @RequestMapping("{beerId}")
+    @RequestMapping(BEER_PATH_ID)
     public BeerDTO getBeerById(@PathVariable("beerId") UUID id) {
 
         log.debug("Get BeerDTO by Id - in beer controller; id="+id.toString());
