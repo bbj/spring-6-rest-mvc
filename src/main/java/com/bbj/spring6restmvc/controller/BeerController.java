@@ -34,7 +34,7 @@ import java.util.UUID;
 //@AllArgsConstructor               //was a mistake before => @RequiredArgsConstructor
 @RequiredArgsConstructor
 @RestController                     //replace @Controller by @RestController (@ResponseBody applied)
-@RequestMapping("/api/v1/beer")   //base path for all queries
+//@RequestMapping("/api/v1/beer")   //base path for all queries
 public class BeerController {
 
     public static final String BEER_PATH = "/api/v1/beer";
@@ -69,8 +69,14 @@ public class BeerController {
             @PathVariable("beerId") UUID beerId,
             @RequestBody BeerDTO beer) {
 
-        beerService.updateBeerById(beerId, beer);
+        /*
+            beerService.updateBeerById(beerId, beer);
+            return new ResponseEntity(HttpStatus.NO_CONTENT); //update ok, no content returned
+        */
 
+        if (beerService.updateBeerById(beerId, beer).isEmpty()) {
+            throw new NotFoundException();
+        }
         return new ResponseEntity(HttpStatus.NO_CONTENT); //update ok, no content returned
     }
 
@@ -90,7 +96,7 @@ public class BeerController {
     }
 
     //if method not specified => will answer all methods (PUT, POST ....)
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping(value = BEER_PATH)
     public List<BeerDTO> listBeers() {
         //beerService.listBeers() does a new ArrayList<>(beerMap.values())
         //where beerMap.values() returns a Collection<V> where V = String
@@ -101,10 +107,10 @@ public class BeerController {
      * It is more reliable to depend on @PathVariable("beerId")
      * than on the parameter name (UUID id)
      */
-    @RequestMapping(BEER_PATH_ID)
-    public BeerDTO getBeerById(@PathVariable("beerId") UUID id) {
+    @GetMapping(value = BEER_PATH_ID)
+    public BeerDTO getBeerById(@PathVariable("beerId") UUID beerId) {
 
-        log.debug("Get BeerDTO by Id - in beer controller; id="+id.toString());
-        return beerService.getBeerById(id).orElseThrow(NotFoundException::new);
+        log.debug("Get BeerDTO by Id - in beer controller; id="+beerId.toString());
+        return beerService.getBeerById(beerId).orElseThrow(NotFoundException::new);
     }
 }

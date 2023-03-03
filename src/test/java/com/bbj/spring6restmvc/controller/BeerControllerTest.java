@@ -93,6 +93,8 @@ class BeerControllerTest {
     void testUpdateBeer() throws Exception {
         BeerDTO beer = beerServiceImpl.listBeers().get(0);
 
+        given(beerService.updateBeerById(any(), any())).willReturn(Optional.of(beer));
+
         mockMvc.perform(put(BeerController.BEER_PATH_ID, beer.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -141,7 +143,7 @@ class BeerControllerTest {
     /*
         throws Exception: as mockMvc.perform is doing a throws Exception
      */
-    @Test                       //JUnit test
+    @Test
     void getBeerById() throws Exception {
         BeerDTO testBeer = beerServiceImpl.listBeers().get(0);
 
@@ -159,16 +161,3 @@ class BeerControllerTest {
                 .andExpect(jsonPath("$.beerName", is(testBeer.getBeerName())));
     }
 }
-
-//WAS THE INITIAL BASIC TEST WHICH WAS RUNNING SPRING BOOT
-//@SpringBootTest
-//class BeerControllerTest {
-//
-//    @Autowired
-//    BeerController beerController;
-//
-//    @Test
-//    void getBeerById() {
-//        System.out.println(beerController.getBeerById(UUID.randomUUID()));
-//    }
-//}
