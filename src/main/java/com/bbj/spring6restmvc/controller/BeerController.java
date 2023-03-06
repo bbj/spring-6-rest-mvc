@@ -44,20 +44,20 @@ public class BeerController {
 
     @PatchMapping(BEER_PATH_ID)
     //@ResponseBody - not needed because we have @RestController
-    public ResponseEntity patchBeerById(
+    public ResponseEntity<Object> patchBeerById(
             @PathVariable("beerId") UUID beerId,
             @RequestBody BeerDTO beer) {
 
         beerService.patchBeerById(beerId, beer);
 
-        return new ResponseEntity(HttpStatus.NO_CONTENT); //update ok, no content returned
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); //update ok, no content returned
     }
 
     @DeleteMapping(BEER_PATH_ID)
-    public ResponseEntity deleteById(@PathVariable("beerId") UUID beerId) {
+    public ResponseEntity<Object> deleteById(@PathVariable("beerId") UUID beerId) {
 
         beerService.deleteById(beerId);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -65,7 +65,7 @@ public class BeerController {
      * than on the parameter name (UUID id)
      */
     @PutMapping(BEER_PATH_ID)
-    public ResponseEntity updateById(
+    public ResponseEntity<Object> updateById(
             @PathVariable("beerId") UUID beerId,
             @RequestBody BeerDTO beer) {
 
@@ -77,12 +77,12 @@ public class BeerController {
         if (beerService.updateBeerById(beerId, beer).isEmpty()) {
             throw new NotFoundException();
         }
-        return new ResponseEntity(HttpStatus.NO_CONTENT); //update ok, no content returned
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); //update ok, no content returned
     }
 
     //@RequestMapping(method = RequestMethod.POST) is equivalent to @PostMapping
     @PostMapping(BEER_PATH)
-    public ResponseEntity handlePost(@RequestBody BeerDTO beer) {
+    public ResponseEntity<Object> handlePost(@RequestBody BeerDTO beer) {
 
         //@RequestBody tells Spring to bind the HTTP request body to this (BeerDTO beer) param
         BeerDTO savedBeer = beerService.saveNewBeer(beer);
@@ -90,7 +90,7 @@ public class BeerController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", BEER_PATH +"/"+savedBeer.getId().toString());
 
-        return new ResponseEntity(
+        return new ResponseEntity<>(
                 headers,
                 HttpStatus.CREATED); //201 status: resource created (saved in DB)
     }
