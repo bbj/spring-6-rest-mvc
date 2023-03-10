@@ -49,7 +49,7 @@ class BeerControllerIT {
         final String beerName = "UPDATED";
         beerDTO.setBeerName(beerName);
 
-        ResponseEntity responseEntity = beerController.updateById(beer.getId(), beerDTO);
+        ResponseEntity<Object> responseEntity = beerController.updateById(beer.getId(), beerDTO);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
 
         Beer updatedBeer = beerRepository.findById(beer.getId()).get(); //Optional.get()
@@ -67,7 +67,7 @@ class BeerControllerIT {
 
         //in reality SpringMVC will transform HTTP request body into a DTO object
         //here we create the DTO with Lombok builder and pass it to controller
-        ResponseEntity responseEntity = beerController.handlePost(beerDTO);
+        ResponseEntity<Object> responseEntity = beerController.handlePost(beerDTO);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(201));
         assertThat(responseEntity.getHeaders().getLocation()).isNotNull(); //java.net.URI getLocation()
